@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>登录表单</title>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var form = document.querySelector('form');
+
+  form.addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    // 获取表单数据
+    var username = document.getElementById('username').value;
+    var selectValue = document.getElementById('select-box').value;
+    var data = {
+      province: "北京市",
+      city: "北京市",
+      district: "海淀区",
+      adcode: "110108",
+      addr: "海淀区中关村方正国际大厦(善缘街西)",
+      lat: "39.984376",
+      lng: "116.313178",
+      accuracy: "0",
+      dk_desc: ""
+    };
+
+    // 设置请求头
+    var headers = new Headers({
+      "User-Agent": "Mozilla/5.0 (Linux; Android 11; xiaomi 12s Build/RP1A.201005.004.A1; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/109.0.5414.86 MQQBrowser/6.2 TBS/046905 Mobile Safari/537.36 wxwork/4.1.16 MicroMessenger/7.0.1 NetType/WIFI Language/zh Lang/zh ColorScheme/Light",
+      "X-Requested-With": "com.tencent.wework",
+      "Upgrade-Insecure-Requests": "1",
+      "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/wxpic,image/sharpp,image/apng,image/tpg,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+      "Referer": "http://portal.pku-hit.com/wx_api/oauth2_callback/beijing-BeiDaYiXinBI-18?state=tentcentweixin",
+      "Accept-Encoding": "gzip, deflate",
+      "Accept-Language": "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7",
+      "Connection": "keep-alive"
+    });
+
+    // 发送预请求
+    fetch('http://portal.pku-hit.com/oa/hr/apps/attendance/CardLocationJSNavigation?ssouserdid=' + encodeURIComponent(username), {
+      method: 'GET',
+      headers: headers,
+      timeout: 30000 // 30秒超时
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response;
+    })
+    .then(() => {
+      // 发送POST请求
+      return fetch('http://portal.pku-hit.com/oa/hr/apps/attendance/upLocationJS', {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(data),
+        timeout: 30000 // 30秒超时
+      });
+    })
+    .then(response => response.json())
+    .then(result => {
+      if (result.success) {
+        alert('数据提交成功!');
+      } else {
+        alert('数据提交失败: ' + result.message);
+      }
+    })
+    .catch(error => {
+      console.error('There was a problem with the fetch operation:', error);
+      alert('请求失败，请稍后重试。');
+    });
+  });
+});
+</script>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+  }
+  .login-container {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+  h2 {
+    text-align: center;
+  }
+  .form-group {
+    margin-bottom: 15px;
+  }
+  .form-group label {
+    display: block;
+    margin-bottom: 5px;
+  }
+  .form-group input,
+  .form-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+  .form-group button {
+    width: 100%;
+    padding: 10px;
+    background-color: #5cb85c;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .form-group button:hover {
+    background-color: #4cae4c;
+  }
+</style>
+</head>
+<body>
+
+<div class="login-container">
+  <h2>用户登录</h2>
+  <form>
+    <div class="form-group">
+      <label for="username">用户名:</label>
+      <input type="text" id="username" name="username" required>
+    </div>
+    <div class="form-group">
+      <label for="select-box">选择框:</label>
+      <select id="select-box" name="select">
+        <option value="option1">选项1</option>
+        <option value="option2">选项2</option>
+        <option value="option3">选项3</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <button type="submit">提交</button>
+    </div>
+  </form>
+</div>
+
+</body>
+</html>
